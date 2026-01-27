@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  Boolean   @default(false)
+  password       String?
+  image          String?
+  githubId       String?   @unique
+  githubUsername String?   @unique
+  githubUrl      String?
+  googleId       String?   @unique
+  bio            String?   @db.Text
+  skills         String[]
+  availability   String?
+  timezone       String?
+  role           String    @default("user")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  
+  projects       Project[]
+  interests      Interest[]
+  
+  @@index([email])
+  @@index([githubId])
+  @@index([googleId])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  techStack   String[]
+  lookingFor  String
+  status      String   @default("open")
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interests   Interest[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Interest {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  status    String   @default("pending")
+  message   String?  @db.Text
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+  @@index([status])
+}
