@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from "jsonwebtoken";
 
 interface JWTPayload {
   userId: string;
@@ -6,9 +6,10 @@ interface JWTPayload {
 }
 
 export const generateToken = (payload: JWTPayload): string => {
-  return jwt.sign(payload, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRE || '7d'
-  });
+  const signInOptions: SignOptions = {
+    expiresIn: (process.env.JWT_EXPIRE || "7d") as any,
+  };
+  return jwt.sign(payload, process.env.JWT_SECRET!, signInOptions);
 };
 
 export const verifyToken = (token: string): JWTPayload => {
