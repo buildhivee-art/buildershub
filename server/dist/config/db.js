@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-import "dotenv/config";
+import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
 const prisma = new PrismaClient({
-    log: ["query", "error", "warn"],
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
 });
 export default prisma;

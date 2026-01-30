@@ -21,14 +21,15 @@
   "author": "Sahil Sahu",
   "license": "MIT",
   "dependencies": {
-    "@prisma/client": "^7.3.0",
+    "@prisma/client": "^5.10.2",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
     "express": "^4.19.2",
     "express-validator": "^7.3.1",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.13"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -37,10 +38,11 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.10",
+    "@types/nodemailer": "^7.0.9",
     "eslint": "^9.39.2",
     "nodemon": "^3.1.11",
     "prettier": "^3.8.1",
-    "prisma": "^7.3.0",
+    "prisma": "^5.10.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
