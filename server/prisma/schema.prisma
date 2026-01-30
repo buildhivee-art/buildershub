@@ -40,6 +40,14 @@ model Project {
   techStack   String[]
   lookingFor  String
   status      String   @default("open")
+  
+  // Rich content
+  images      String[]
+  demoUrl     String?
+  repoUrl     String?
+  difficulty  String   @default("Intermediate")
+  category    String   @default("Web Development")
+  
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   interests   Interest[]
@@ -48,6 +56,7 @@ model Project {
   
   @@index([userId])
   @@index([status])
+  @@index([category])
   @@index([createdAt])
 }
 

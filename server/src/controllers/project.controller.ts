@@ -6,7 +6,7 @@ import { AuthRequest } from '../middlewares/auth.middleware.js';
 // Create a new project
 export const createProject = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, techStack, lookingFor } = req.body;
+    const { title, description, techStack, lookingFor, images, demoUrl, repoUrl, difficulty, category } = req.body;
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -20,6 +20,11 @@ export const createProject = async (req: AuthRequest, res: Response) => {
         description,
         techStack,
         lookingFor,
+        images: images || [],
+        demoUrl,
+        repoUrl,
+        difficulty: difficulty || "Intermediate",
+        category: category || "Web Development",
         userId,
       },
     });
@@ -36,12 +41,23 @@ export const getProjects = async (req: AuthRequest, res: Response) => {
   try {
     const pageQuery = req.query.page;
     const limitQuery = req.query.limit;
+    const categoryQuery = req.query.category;
+    const statusQuery = req.query.status;
     
     const page = pageQuery ? parseInt(String(pageQuery)) : 1;
     const limit = limitQuery ? parseInt(String(limitQuery)) : 10;
     const skip = (page - 1) * limit;
 
+    const where: any = {};
+    if (categoryQuery) {
+        where.category = String(categoryQuery);
+    }
+    if (statusQuery) {
+        where.status = String(statusQuery);
+    }
+
     const projects = await prisma.project.findMany({
+      where,
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
@@ -57,7 +73,7 @@ export const getProjects = async (req: AuthRequest, res: Response) => {
       }
     });
 
-    const total = await prisma.project.count();
+    const total = await prisma.project.count({ where });
 
     res.status(200).json({
       projects,
@@ -107,7 +123,7 @@ export const getProjectById = async (req: AuthRequest, res: Response) => {
 export const updateProject = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { title, description, techStack, lookingFor, status } = req.body;
+    const { title, description, techStack, lookingFor, status, images, demoUrl, repoUrl, difficulty, category } = req.body;
     const userId = req.user?.userId;
 
     const existingProject = await prisma.project.findUnique({ where: { id } });
@@ -129,7 +145,12 @@ export const updateProject = async (req: AuthRequest, res: Response) => {
         description,
         techStack,
         lookingFor,
-        status
+        status,
+        images,
+        demoUrl,
+        repoUrl,
+        difficulty,
+        category
       },
     });
 

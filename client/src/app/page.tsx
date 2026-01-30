@@ -32,76 +32,70 @@ export default function Home() {
       <main className="flex-1">
         
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-32 pb-20 lg:pt-40 lg:pb-32">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+        <section className="relative overflow-hidden pt-32 pb-40 lg:pt-48 lg:pb-48">
+          <div className="container px-4 mx-auto relative z-10">
               <motion.div 
-                className="flex flex-col justify-center space-y-8"
+                className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto"
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
               >
-                <motion.div variants={itemVariants} className="space-y-4">
-                  <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium backdrop-blur-sm bg-muted/50">
-                    <span className="flex h-2 w-2 rounded-full bg-green-500 mr-2 animate-pulse" />
-                    v1.0 is now live
+                <motion.div variants={itemVariants}>
+                   <div className="inline-flex items-center rounded-full border bg-background/50 backdrop-blur-sm px-3 py-1 text-sm text-foreground/80 shadow-sm mb-6 transition-colors hover:bg-background/80">
+                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    BuildHive v1.0 is live
+                    <ArrowRight className="ml-2 h-3 w-3" />
                   </div>
-                  <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl xl:text-7xl/none">
-                    Build Faster, <span className="text-primary">Together.</span>
+                  <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-4">
+                    Your code needs a <br className="hidden md:block"/>
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-amber-500">
+                      perfect community
+                    </span>
                   </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl leading-relaxed">
-                    The ultimate platform for developers to find teammates, showcase portfolios, and ship side-projects that matter.
-                  </p>
                 </motion.div>
                 
-                <motion.div variants={itemVariants} className="flex flex-col gap-3 min-[400px]:flex-row">
+                <motion.div variants={itemVariants}>
+                    <p className="max-w-2xl text-lg md:text-xl text-muted-foreground leading-relaxed">
+                        The modern platform for developers to collaborate on side-projects, share work, and grow together. Stop building alone.
+                    </p>
+                </motion.div>
+                
+                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 pt-4">
+                  <Link href="/projects">
+                    <Button size="lg" className="h-14 px-8 rounded-full text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                      Explore Projects
+                    </Button>
+                  </Link>
                   <Link href="/signup">
-                    <Button size="lg" className="h-12 px-8 text-base group">
-                      Get Started 
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                  </Link>
-                  <Link href="#features">
-                    <Button variant="outline" size="lg" className="h-12 px-8 text-base">
-                      Learn More
+                    <Button variant="outline" size="lg" className="h-14 px-8 rounded-full text-base border-primary/20 bg-primary/5 hover:bg-primary/10">
+                      Collaborate Now
                     </Button>
                   </Link>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="h-8 w-8 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[10px] font-bold">
-                        U{i}
-                      </div>
-                    ))}
-                  </div>
-                  <p>Joined by 1,000+ developers</p>
+                {/* Social Proof / Stats */}
+                <motion.div variants={itemVariants} className="pt-12 flex items-center justify-center gap-8 text-sm text-muted-foreground/80">
+                    <div className="flex flex-col items-center">
+                        <span className="font-bold text-foreground text-xl">100+</span>
+                        <span>Projects</span>
+                    </div>
+                    <div className="h-8 w-px bg-border/50" />
+                    <div className="flex flex-col items-center">
+                        <span className="font-bold text-foreground text-xl">500+</span>
+                        <span>Developers</span>
+                    </div>
+                    <div className="h-8 w-px bg-border/50" />
+                    <div className="flex flex-col items-center">
+                        <span className="font-bold text-foreground text-xl">Free</span>
+                        <span>Forever</span>
+                    </div>
                 </motion.div>
               </motion.div>
-
-              <motion.div 
-                className="relative mx-auto lg:ml-auto"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                <div className="relative h-[400px] w-[400px] sm:h-[500px] sm:w-[500px] lg:h-[600px] lg:w-[600px]">
-                   {/* Abstract Glowing Orb/Shape usually goes here, we use the image */}
-                   <Image 
-                     src="/images/hero_abstract.png" 
-                     alt="BuildHive Collaboration" 
-                     fill 
-                     className="object-contain drop-shadow-2xl"
-                     priority
-                   />
-                </div>
-                {/* Decorative Elements */}
-                <div className="absolute -top-12 -right-12 h-64 w-64 rounded-full bg-primary/10 blur-3xl -z-10" />
-                <div className="absolute -bottom-12 -left-12 h-64 w-64 rounded-full bg-secondary/20 blur-3xl -z-10" />
-              </motion.div>
-            </div>
           </div>
+          
+          {/* Background Gradients */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary/20 blur-[130px] rounded-full opacity-30 -z-10 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         </section>
 
         {/* Features Section */}
