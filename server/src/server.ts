@@ -31,7 +31,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/api/auth", authRoutes);
+import interestRoutes from "./routes/interest.routes.js";
+import userRoutes from "./routes/user.routes.js";
+
+app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/interests", interestRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server is running");

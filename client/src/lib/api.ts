@@ -71,10 +71,16 @@ export const fetchProjectById = async (id: string) => {
 };
 
 export const createProject = async (data: any) => {
+  const isFormData = data instanceof FormData;
+  const headers = getHeaders();
+  if (isFormData) {
+      delete (headers as any)['Content-Type'];
+  }
+
   const response = await fetch(`${API_URL}/projects`, {
     method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(data),
+    headers: headers,
+    body: isFormData ? data : JSON.stringify(data),
   });
 
   if (!response.ok) {
@@ -85,10 +91,16 @@ export const createProject = async (data: any) => {
 };
 
 export const updateProject = async (id: string, data: any) => {
+  const isFormData = data instanceof FormData;
+  const headers = getHeaders();
+  if (isFormData) {
+      delete (headers as any)['Content-Type'];
+  }
+
   const response = await fetch(`${API_URL}/projects/${id}`, {
     method: 'PATCH',
-    headers: getHeaders(),
-    body: JSON.stringify(data),
+    headers: headers,
+    body: isFormData ? data : JSON.stringify(data),
   });
 
   if (!response.ok) {
@@ -104,9 +116,80 @@ export const deleteProject = async (id: string) => {
     headers: getHeaders(),
   });
 
+// ... deleteProject function ...
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Failed to delete project');
   }
   return response.json();
 };
+
+// Interest System
+export const expressInterestAPI = async (projectId: string, message: string) => {
+    const headers = getHeaders();
+    const response = await fetch(`${API_URL}/interests/${projectId}`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ message })
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to submit interest");
+    }
+    return response.json();
+}
+
+export const checkInterestStatusAPI = async (projectId: string) => {
+    const headers = getHeaders();
+    const response = await fetch(`${API_URL}/interests/status/${projectId}`, {
+        method: "GET",
+        headers
+    });
+    
+// ... interest check ...
+    if (!response.ok) return null;
+    return response.json();
+}
+
+// User Profile System
+export const getUserProfile = async (username: string) => {
+    const headers = getHeaders();
+    const response = await fetch(`${API_URL}/users/${username}`, {
+        method: "GET", 
+        headers
+    });
+    if (!response.ok) return null;
+    return response.json();
+}
+
+export const getMyProfile = async () => {
+    const headers = getHeaders();
+    const response = await fetch(`${API_URL}/users/me`, {
+        method: "GET",
+        headers
+    });
+    if (!response.ok) {
+         throw new Error("Failed to fetch profile");
+    }
+// ... getMyProfile ...
+    return response.json();
+}
+
+export const updateProfileAPI = async (data: FormData) => {
+    const headers = getHeaders();
+    // Remove Content-Type header to let browser set boundary for FormData
+    delete (headers as any)['Content-Type'];
+
+    const response = await fetch(`${API_URL}/users/me`, {
+        method: "PATCH",
+        headers,
+        body: data
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update profile");
+    }
+    return response.json();
+}
+

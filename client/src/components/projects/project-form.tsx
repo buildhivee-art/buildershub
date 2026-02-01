@@ -53,7 +53,8 @@ interface ProjectFormProps {
 export function ProjectForm({ initialData, mode = "create" }: ProjectFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [imageInput, setImageInput] = useState("")
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [existingImages, setExistingImages] = useState<string[]>(initialData?.images || [])
 
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
@@ -71,33 +72,60 @@ export function ProjectForm({ initialData, mode = "create" }: ProjectFormProps) 
     },
   })
 
-  // Helper to add image URL to array
-  const addImage = () => {
-    if (!imageInput) return;
-    try {
-        new URL(imageInput); // Basic validation
-        const currentImages = form.getValues("images") || [];
-        form.setValue("images", [...currentImages, imageInput]);
-        setImageInput("");
-    } catch {
-        toast.error("Please enter a valid URL");
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+        const files = Array.from(e.target.files);
+        setSelectedFiles(prev => [...prev, ...files]);
     }
   }
 
-  const removeImage = (index: number) => {
-      const currentImages = form.getValues("images") || [];
-      form.setValue("images", currentImages.filter((_, i) => i !== index));
+  // Remove selected file
+  const removeFile = (index: number) => {
+      setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   }
 
+  // Remove existing image
+  const removeExistingImage = (index: number) => {
+      setExistingImages(prev => prev.filter((_, i) => i !== index));
+  }
+
+  // Create/Update with FormData
   async function onSubmit(data: ProjectFormValues) {
     setIsLoading(true)
     try {
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('description', data.description);
+      formData.append('lookingFor', data.lookingFor);
+      formData.append('difficulty', data.difficulty || "Intermediate");
+      formData.append('category', data.category || "Web Development");
+      if (data.status) formData.append('status', data.status);
+      if (data.demoUrl) formData.append('demoUrl', data.demoUrl);
+      if (data.repoUrl) formData.append('repoUrl', data.repoUrl);
+
+      // Append techStack
+      if (data.techStack.length > 0) {
+          // Sending as JSON string is often safer with some backend parsers
+          formData.append('techStack', JSON.stringify(data.techStack));
+      }
+
+      // Append Existing Images (to keep)
+      if (existingImages.length > 0) {
+          formData.append('images', JSON.stringify(existingImages));
+      }
+
+      // Append New Files
+      selectedFiles.forEach(file => {
+          formData.append('imageFiles', file);
+      });
+
       if (mode === "create") {
-         const newProject = await createProject(data);
+         const newProject = await createProject(formData);
          toast.success("Project created successfully!");
          router.push(`/projects/${newProject.id}`);
       } else if (mode === "edit" && initialData?.id) {
-         await updateProject(initialData.id, data);
+         await updateProject(initialData.id, formData);
          toast.success("Project updated successfully!");
          router.push(`/projects/${initialData.id}`);
       }
@@ -283,35 +311,65 @@ export function ProjectForm({ initialData, mode = "create" }: ProjectFormProps) 
              />
         </div>
 
-        {/* Image Upload Handled simply as URL input list for now */}
+        {/* Image Upload */}
         <div className="space-y-4">
-            <FormLabel>Project Images (URLs)</FormLabel>
-            <div className="flex gap-2">
+            <FormLabel>Project Images</FormLabel>
+            <div className="border border-dashed border-input rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-accent/50 transition-colors relative">
                 <Input 
-                    placeholder="https://example.com/image.png" 
-                    value={imageInput} 
-                    onChange={(e) => setImageInput(e.target.value)}
+                   type="file" 
+                   id='image-upload'
+                   multiple 
+                   accept="image/*" 
+                   className="absolute inset-0 opacity-0 cursor-pointer" 
+                   onChange={handleFileChange}
                 />
-                <Button type="button" variant="secondary" onClick={addImage}>Add</Button>
+                <label htmlFor='image-upload'>
+                <div  className="p-4 rounded-full bg-primary/10 text-primary mb-2">
+                    <Plus className="h-6 w-6" />
+                </div>
+                </label>
+                <p className="text-sm font-medium">Click to upload images</p>
+                <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 5MB</p>
             </div>
+            
+            {/* Previews */}
             <div className="flex flex-wrap gap-4 mt-4">
-                {form.watch("images")?.map((url, idx) => (
-                    <div key={idx} className="relative group w-32 h-20 rounded-md overflow-hidden bg-muted">
+                {/* Existing Images */}
+                {existingImages.map((url, idx) => (
+                    <div key={`existing-${idx}`} className="relative group w-32 h-20 rounded-md overflow-hidden bg-muted border">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="project preview" className="object-cover w-full h-full" />
                         <button 
                             type="button"
-                            onClick={() => removeImage(idx)}
-                            className="absolute top-1 right-1 bg-black/50 hover:bg-black/70 text-white rounded-full p-1"
+                            onClick={() => removeExistingImage(idx)}
+                            className="absolute top-1 right-1 bg-black/50 hover:bg-red-500/80 text-white rounded-full p-1 transition-colors"
                         >
                             <Trash className="h-3 w-3" />
                         </button>
+                         <div className="absolute bottom-0 w-full bg-black/60 text-white text-[10px] text-center">Existing</div>
+                    </div>
+                ))}
+                
+                {/* New Files */}
+                {selectedFiles.map((file, idx) => (
+                    <div key={`new-${idx}`} className="relative group w-32 h-20 rounded-md overflow-hidden bg-muted border">
+                        {/* Preview blob */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={URL.createObjectURL(file)} alt="new preview" className="object-cover w-full h-full" />
+                        <button 
+                            type="button"
+                            onClick={() => removeFile(idx)}
+                            className="absolute top-1 right-1 bg-black/50 hover:bg-red-500/80 text-white rounded-full p-1 transition-colors"
+                        >
+                            <Trash className="h-3 w-3" />
+                        </button>
+                        <div className="absolute bottom-0 w-full bg-green-500/60 text-white text-[10px] text-center">New</div>
                     </div>
                 ))}
             </div>
         </div>
 
-
+        {/* ... (Status field if edit mode) ... */}
         {mode === "edit" && (
             <FormField
             control={form.control}

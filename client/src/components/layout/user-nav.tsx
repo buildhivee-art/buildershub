@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import {
   Avatar,
   AvatarFallback,
@@ -17,15 +18,24 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import { getMyProfile } from "@/lib/api"
+import Link from "next/link"
 
 export function UserNav() {
   const router = useRouter()
-  // In a real app, this would come from a context or hook
-  const user = {
-    name: "User",
-    email: "user@example.com",
-    image: "",
-  }
+  const [user, setUser] = React.useState<any>(null)
+
+  React.useEffect(() => {
+    const loadUser = async () => {
+        try {
+            const data = await getMyProfile();
+            setUser(data);
+        } catch (e) {
+            console.error("Failed to load user for nav", e);
+        }
+    }
+    loadUser();
+  }, []);
   
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -38,26 +48,28 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/images/avatars/01.png" alt="@user" />
-            <AvatarFallback>SC</AvatarFallback>
+            <AvatarImage src={user?.image || ""} alt={user?.name || "@user"} />
+            <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Sahil Sahu</p>
+            <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              sahil@example.com
+              {user?.email || "user@example.com"}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-          </DropdownMenuItem>
+          <Link href={user?.githubUsername ? `/profile/${user.githubUsername}` : "/projects"}>
+            <DropdownMenuItem>
+                Profile
+                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuItem>
             Billing
             <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>

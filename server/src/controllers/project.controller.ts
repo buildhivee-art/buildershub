@@ -2,29 +2,65 @@
 import { Response } from 'express';
 import prisma from '../lib/prisma.js';
 import { AuthRequest } from '../middlewares/auth.middleware.js';
+import { uploadToCloudinary } from '../lib/cloudinary-upload.js';
 
 // Create a new project
 export const createProject = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, techStack, lookingFor, images, demoUrl, repoUrl, difficulty, category } = req.body;
+    const { title, description, techStack, lookingFor, demoUrl, repoUrl, difficulty, category } = req.body;
+    let { images } = req.body;
     const userId = req.user?.userId;
+    const files = req.files as Express.Multer.File[];
 
     if (!userId) {
        res.status(401).json({ message: "Unauthorized" });
        return 
     }
 
+    // Handle Tech Stack parsing
+    let parsedTechStack = techStack;
+    if (typeof techStack === 'string') {
+        try {
+            parsedTechStack = JSON.parse(techStack);
+        } catch {
+            parsedTechStack = techStack.split(',').map((t: string) => t.trim());
+        }
+    }
+
+    // Handle Images
+    let projectImages: string[] = [];
+    if (images) {
+        if (typeof images === 'string') {
+             try {
+                const parsed = JSON.parse(images);
+                if (Array.isArray(parsed)) projectImages = parsed;
+                else projectImages = [images]; 
+             } catch {
+                projectImages = [images];
+             }
+        } else if (Array.isArray(images)) {
+            projectImages = images;
+        }
+    }
+
+    // Upload new files
+    if (files && files.length > 0) {
+        const uploadPromises = files.map(file => uploadToCloudinary(file.buffer));
+        const uploadedUrls = await Promise.all(uploadPromises);
+        projectImages = [...projectImages, ...uploadedUrls];
+    }
+
     const project = await prisma.project.create({
       data: {
-        title,
-        description,
-        techStack,
-        lookingFor,
-        images: images || [],
-        demoUrl,
-        repoUrl,
-        difficulty: difficulty || "Intermediate",
-        category: category || "Web Development",
+        title: String(title),
+        description: String(description),
+        techStack: Array.isArray(parsedTechStack) ? parsedTechStack : [],
+        lookingFor: String(lookingFor),
+        images: projectImages,
+        demoUrl: demoUrl ? String(demoUrl) : null,
+        repoUrl: repoUrl ? String(repoUrl) : null,
+        difficulty: difficulty ? String(difficulty) : "Intermediate",
+        category: category ? String(category) : "Web Development",
         userId,
       },
     });
@@ -43,6 +79,7 @@ export const getProjects = async (req: AuthRequest, res: Response) => {
     const limitQuery = req.query.limit;
     const categoryQuery = req.query.category;
     const statusQuery = req.query.status;
+    const sortQuery = req.query.sort;
     
     const page = pageQuery ? parseInt(String(pageQuery)) : 1;
     const limit = limitQuery ? parseInt(String(limitQuery)) : 10;
@@ -56,11 +93,18 @@ export const getProjects = async (req: AuthRequest, res: Response) => {
         where.status = String(statusQuery);
     }
 
+    let orderBy: any = { createdAt: 'desc' };
+    if (sortQuery === 'popular') {
+        orderBy = { createdAt: 'desc' }; 
+    } else if (sortQuery === 'launching') {
+        where.status = 'launching';
+    }
+
     const projects = await prisma.project.findMany({
       where,
       skip,
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy,
       include: {
         user: {
           select: {
@@ -123,8 +167,10 @@ export const getProjectById = async (req: AuthRequest, res: Response) => {
 export const updateProject = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { title, description, techStack, lookingFor, status, images, demoUrl, repoUrl, difficulty, category } = req.body;
+    const { title, description, techStack, lookingFor, status, demoUrl, repoUrl, difficulty, category } = req.body;
+    let { images } = req.body;
     const userId = req.user?.userId;
+    const files = req.files as Express.Multer.File[];
 
     const existingProject = await prisma.project.findUnique({ where: { id } });
 
@@ -138,19 +184,56 @@ export const updateProject = async (req: AuthRequest, res: Response) => {
        return
     }
 
+    // Handle Tech Stack parsing
+    let parsedTechStack = techStack;
+    if (techStack && typeof techStack === 'string') {
+        try {
+             parsedTechStack = JSON.parse(techStack);
+        } catch {
+             parsedTechStack = techStack.split(',').map((t: string) => t.trim());
+        }
+    }
+
+    // Handle Images
+    let projectImages: string[] = [];
+    if (images) {
+         if (typeof images === 'string') {
+             try {
+                 const parsed = JSON.parse(images);
+                 if (Array.isArray(parsed)) projectImages = parsed;
+                 else projectImages = [images];
+             } catch {
+                 projectImages = [images];
+             }
+        } else if (Array.isArray(images)) {
+             projectImages = images;
+        }
+    } else {
+        if (images === undefined) {
+             projectImages = existingProject.images;
+        }
+    }
+
+    // Upload new files
+    if (files && files.length > 0) {
+        const uploadPromises = files.map(file => uploadToCloudinary(file.buffer));
+        const uploadedUrls = await Promise.all(uploadPromises);
+        projectImages = [...projectImages, ...uploadedUrls];
+    }
+
     const updatedProject = await prisma.project.update({
       where: { id },
       data: {
-        title,
-        description,
-        techStack,
-        lookingFor,
-        status,
-        images,
-        demoUrl,
-        repoUrl,
-        difficulty,
-        category
+        title: String(title),
+        description: String(description),
+        techStack: parsedTechStack ? (Array.isArray(parsedTechStack) ? parsedTechStack : []) : undefined,
+        lookingFor: lookingFor ? String(lookingFor) : undefined,
+        status: status ? String(status) : undefined,
+        images: projectImages,
+        demoUrl: demoUrl ? String(demoUrl) : null,
+        repoUrl: repoUrl ? String(repoUrl) : null,
+        difficulty: difficulty ? String(difficulty) : undefined,
+        category: category ? String(category) : undefined,
       },
     });
 

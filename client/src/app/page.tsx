@@ -26,6 +26,7 @@ export default function Home() {
       transition: { duration: 0.5 }
     }
   }
+  const token = localStorage.getItem("token")
 
   return (
     <div className="flex min-h-screen flex-col bg-background selection:bg-primary/10 selection:text-primary">
@@ -48,7 +49,7 @@ export default function Home() {
                   </div>
                   <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-4">
                     Your code needs a <br className="hidden md:block"/>
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-400 to-amber-500">
+                    <span className="bg-clip-text text-transparent bg-linear-to-r from-primary via-orange-400 to-amber-500">
                       perfect community
                     </span>
                   </h1>
@@ -95,7 +96,7 @@ export default function Home() {
           
           {/* Background Gradients */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary/20 blur-[130px] rounded-full opacity-30 -z-10 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-border to-transparent" />
         </section>
 
         {/* Features Section */}
@@ -184,6 +185,7 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
+        {!token && 
         <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
            <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
            <div className="container px-4 md:px-6 mx-auto relative z-10 text-center space-y-8">
@@ -198,7 +200,7 @@ export default function Home() {
               </Link>
            </div>
         </section>
-
+        }
       </main>
       <Footer />
     </div>

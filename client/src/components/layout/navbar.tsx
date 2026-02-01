@@ -127,7 +127,7 @@ export function Navbar() {
                  </>
             )}
 
-           <ModeToggle />
+           {/* <ModeToggle /> */}
            
            {isLoggedIn ? (
               <UserNav />
