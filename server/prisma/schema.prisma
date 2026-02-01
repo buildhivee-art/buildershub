@@ -23,15 +23,30 @@ model User {
   availability   String?
   timezone       String?
   role           String    @default("user")
+  
+  // Subscription
+  plan                   Plan      @default(FREE)
+  razorpayCustomerId     String?
+  razorpaySubscriptionId String?
+  subscriptionStatus     String?   // active, past_due, etc.
+  subscriptionEndDate    DateTime?
+
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   
   projects       Project[]
   interests      Interest[]
+  codeReviews    CodeReview[]
   
   @@index([email])
   @@index([githubId])
   @@index([googleId])
+}
+
+enum Plan {
+  FREE
+  PREMIUM
+  PRO
 }
 
 model Project {
@@ -85,4 +100,21 @@ model Otp {
   createdAt DateTime @default(now())
 
   @@index([email])
+}
+
+model CodeReview {
+  id          String   @id @default(cuid())
+  userId      String?
+  code        String   @db.Text
+  language    String
+  score       Int?
+  issues      Json?    // Array of issues found
+  suggestions Json?    // Array of suggestions
+  resources   Json?    // Array of learning resources
+  createdAt   DateTime @default(now())
+  
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([createdAt])
 }

@@ -118,6 +118,12 @@ export function Navbar() {
                         <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
                       </svg>
                    </Button>
+                   <Link href="/code-review">
+                        <Button variant="ghost" size="sm" className="hidden sm:inline-flex gap-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                             Review
+                        </Button>
+                   </Link>
                    <Link href="/projects/new">
                         <Button size="sm" className="hidden sm:inline-flex rounded-full gap-2">
                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>

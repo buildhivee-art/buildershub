@@ -199,7 +199,7 @@ export default function ProfilePage() {
             <TabsContent value="contributions">
                 <div className="text-center py-20 rounded-xl border border-dashed bg-card/50">
                     <h3 className="text-lg font-medium">Coming Soon</h3>
-                    <p className="text-muted-foreground mt-1">Contribution history will be available in Phase 5.</p>
+                    <p className="text-muted-foreground mt-1">Contribution history will be available Soon.</p>
                 </div>
             </TabsContent>
        </Tabs>

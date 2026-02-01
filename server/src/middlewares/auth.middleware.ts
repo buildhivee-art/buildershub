@@ -34,3 +34,30 @@ export const authenticate = async (
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 };
+
+export const optionalAuthenticate = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let token = req.headers.authorization?.split(' ')[1];
+
+    if (!token && req.cookies) {
+      token = req.cookies.token;
+    }
+
+    if (token) {
+       try {
+           const decoded = verifyToken(token);
+           req.user = decoded;
+       } catch {
+           // Ignore invalid token in optional auth
+       }
+    }
+    
+    next();
+  } catch (error) {
+    next();
+  }
+};

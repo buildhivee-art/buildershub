@@ -10,7 +10,11 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({
+  verify: (req: any, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 
 import session from 'express-session';
 import passport from './config/passport.js';
@@ -33,11 +37,15 @@ app.use(passport.session());
 app.use("/api/auth", authRoutes);
 import interestRoutes from "./routes/interest.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import codeReviewRoutes from "./routes/code-review.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
 
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/interests", interestRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/code-reviews", codeReviewRoutes);
+app.use("/api/payment", paymentRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server is running");

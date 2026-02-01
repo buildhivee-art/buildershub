@@ -1,7 +1,7 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-const getHeaders = () => {
+export const getHeaders = () => {
   const token = localStorage.getItem('token');
   return {
     'Content-Type': 'application/json',
@@ -193,3 +193,13 @@ export const updateProfileAPI = async (data: FormData) => {
     return response.json();
 }
 
+
+export const getSubscriptionStatus = async () => {
+    const headers = getHeaders();
+    const response = await fetch(`${API_URL}/payment/status`, {
+        method: "GET",
+        headers
+    });
+    if (!response.ok) return null;
+    return response.json();
+}

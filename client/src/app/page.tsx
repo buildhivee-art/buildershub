@@ -151,6 +151,66 @@ export default function Home() {
               </motion.div>
             </div>
           </div>
+
+        </section>
+
+        {/* AI Code Review Feature Section */}
+        <section className="py-20 bg-blue-50/50 dark:bg-blue-950/10 border-y">
+            <div className="container px-4 md:px-6 mx-auto">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div className="inline-flex items-center rounded-lg bg-blue-100 dark:bg-blue-900 px-3 py-1 text-sm text-blue-800 dark:text-blue-100 mb-4">
+                            New Feature
+                        </div>
+                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl mb-4">
+                            AI-Powered Code Reviews
+                        </h2>
+                        <p className="text-muted-foreground mb-6 text-lg">
+                            Get instant feedback on your code quality. Our AI reviews for bugs,
+                            security issues, performance problems, and suggests improvements.
+                        </p>
+                        <ul className="space-y-3 mb-8">
+                            {[
+                                "Deep static code analysis for bugs",
+                                "Actionable refactoring suggestions",
+                                "Curated learning resources",
+                                "Support for 12+ popular languages"
+                            ].map((item, i) => (
+                                <li key={i} className="flex items-center gap-2">
+                                    <div className="h-5 w-5 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                                        <CheckCircle2 className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                                    </div>
+                                    <span className="text-muted-foreground">{item}</span>
+                                </li>
+                            ))}
+                        </ul>
+                        <Link href="/code-review">
+                            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">Try Code Review Now →</Button>
+                        </Link>
+                    </div>
+                    <div className="relative h-[400px] border rounded-xl overflow-hidden shadow-2xl bg-background">
+                         {/* Mockup of code review interface */}
+                         <div className="flex items-center gap-2 px-4 py-3 border-b bg-muted/50">
+                             <div className="flex gap-1.5">
+                                 <div className="w-3 h-3 rounded-full bg-red-400/80" />
+                                 <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
+                                 <div className="w-3 h-3 rounded-full bg-green-400/80" />
+                             </div>
+                         </div>
+                         <div className="p-6 space-y-4">
+                             <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+                             <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
+                             <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 mt-6">
+                                 <div className="flex items-center gap-2 mb-2">
+                                     <div className="h-4 w-4 bg-blue-500 rounded-full" />
+                                     <div className="h-4 w-32 bg-blue-200 dark:bg-blue-800 rounded" />
+                                 </div>
+                                 <div className="h-16 w-full bg-blue-100 dark:bg-blue-900/50 rounded" />
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         {/* Benefits / List Section */}
